@@ -1,0 +1,1 @@
+worker: python -m music_share_bot.__main__
