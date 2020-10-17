@@ -8,6 +8,7 @@ from ..api.apple_music.api import AppleMusicApi
 from .api_services.manager_data import ServiceDataRequestQuery
 from .api_services.spotify_service_thread import SpotifyServiceThread
 from .api_services.yandex_music_service_thread import YandexMusicServiceThread
+from .utils import duration_in_ms_to_str
 
 logger = telebot.logger
 
@@ -146,15 +147,15 @@ class ApiManagerService(threading.Thread):
                 str_genres = ', '.join(filtered_genres)
 
                 if apple_music_object_name == 'Song':
-                    duration = int(result_instanse.duration / 1000)
-                    telebot_query_name = f'{result_instanse.artist_name} - {result_instanse.name} ({duration//60}:{duration%60})'
-                    telebot_query_description = f'Track - {str_genres} - {result_instanse.release_date}'
+                    duration = duration_in_ms_to_str(result_instanse.duration)
+                    telebot_query_name = f'{result_instanse.artist_name} · {result_instanse.name} ({duration})'
+                    telebot_query_description = f'Track · {str_genres} · {result_instanse.release_date}'
                 if apple_music_object_name == 'Artist':
                     telebot_query_name = f'{result_instanse.name}'
-                    telebot_query_description = f'Artist - {str_genres}'
+                    telebot_query_description = f'Artist · {str_genres}'
                 if apple_music_object_name == 'Album':
                     telebot_query_name = f'{result_instanse.artist_name} - {result_instanse.name}'
-                    telebot_query_description = f'Album - {result_instanse.track_count} tracks - {str_genres} - {result_instanse.release_date}'
+                    telebot_query_description = f'Album · {result_instanse.track_count} tracks · {str_genres} · {result_instanse.release_date}'
 
                 message_content = types.InputTextMessageContent(
                     message_text=f'[Spotify]({spotify_link})\n[Apple Music]({amusic_link})\n[Yandex Music]({ym_link})', parse_mode='Markdown'

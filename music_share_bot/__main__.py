@@ -1,7 +1,9 @@
 import logging
 import os
-from telebot import TeleBot
+
 import telebot
+from telebot import TeleBot
+
 from .bot import MusicShareBotPolling
 
 logger = telebot.logger

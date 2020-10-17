@@ -31,7 +31,8 @@ class YandexMusicServiceThread(threading.Thread):
                 )
                 request.result = getattr(result, request.query_data_type + 's').items[0]
             except Exception as e:
-                logger.exception(e)
+                logger.warning(f'\"{request.query_text}\" not found or found with errors.')
+                logger.debug(e)
                 request.result = None
                 request.bad = True
             request.completed = True

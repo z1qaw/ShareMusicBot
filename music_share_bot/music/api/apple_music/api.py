@@ -9,7 +9,7 @@ class AppleMusicApi:
     def __init__(self, session: requests.Session):
         self.session = session
         self.api_host = 'https://amp-api.music.apple.com'
-        self.auth_key = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNTk2NzQ4MjU1LCJleHAiOjE2MTIzMDAyNTV9.0RaBH15qTCKAhV3toQzZfxjNkYg6cqNagNUPQMkpUE3Ox6O-EV-3G42hOJprkv-b8tLBUG6lxa94W7BORdYluw'
+        self.auth_key = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNTk4NDE4MjQwLCJleHAiOjE2MTM5NzAyNDB9.FemTn31_pZp3RY88DLQWKtn13gyj3uNcqBYwUi7zbNPN8mKgexKu36sOoDI7F4dBqOSmKZaBeiafXINRgPPgSw'
 
     def make_api_request(self, api_method_path, params):
         api_method_url = self.api_host + api_method_path
