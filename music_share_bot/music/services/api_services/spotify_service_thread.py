@@ -2,8 +2,8 @@ import threading
 from queue import LifoQueue
 
 import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
 import telebot
+from spotipy.oauth2 import SpotifyClientCredentials
 
 from .manager_data import ServiceDataRequestQuery
 

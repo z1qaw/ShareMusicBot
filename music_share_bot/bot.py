@@ -3,12 +3,10 @@ import threading
 import time
 
 import telebot
-from celery import Celery
 
 from .music.services.api_manager_service import ApiManagerService
 
 logger = telebot.logger
-celery_app = Celery()
 
 class MusicShareBotPolling(threading.Thread):
     def __init__(self, telebot_instanse: telebot.TeleBot, error_reload_interval: int = 10,
