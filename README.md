@@ -14,10 +14,10 @@ ShareMusicBot helps people who use different streaming services for music. If yo
 `$ pip install -r requirements.txt`  
 3. Export environment variables with your API keys:  
 a) Export Telegram Bot API Key - you can get it from @botfather bot in Telegram:  
-`$ export SHARE_MUSIC_BOT_TOKEN="949481120:AAFUpq3vgUrVfK2oHLmHjYpxdqe1e4LdW5U"`  
+`$ export SHARE_MUSIC_BOT_TOKEN="YOUR_TELEGRAM_TOKEN"`  
 b) Export Spotify app Client ID and Secret - you can get it from your [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/applications).  
-`$ export SPOTIPY_CLIENT_ID="b1b68488984a4bf49473c0b4c6883878"`  
-`$ export SPOTIPY_CLIENT_SECRET="0ece95f8664d42a8ab442088395b04d3"`  
+`$ export SPOTIPY_CLIENT_ID="YOU_CLIENT_ID"`  
+`$ export SPOTIPY_CLIENT_SECRET="YOUR_CLIENT_SECRET"`  
 4. Run:  
 `$ python -m music_share_bot.__main__`  
   
