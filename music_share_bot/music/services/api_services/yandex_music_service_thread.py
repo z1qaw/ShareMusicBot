@@ -22,7 +22,7 @@ class YandexMusicServiceThread(threading.Thread):
     def run(self):
         while True:
             request = self.requests_queue.get()
-            
+
             try:
                 result = self.api.search(
                         request.query_text,
@@ -35,5 +35,6 @@ class YandexMusicServiceThread(threading.Thread):
                 logger.debug(e)
                 request.result = None
                 request.bad = True
+
             request.completed = True
             self.manager.append_completed_query_task(request)

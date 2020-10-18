@@ -30,9 +30,10 @@ class SpotifyServiceThread(threading.Thread):
                         type=request.query_data_type
                 )[request.query_data_type + 's']['items'][0]
             except Exception as e:
-                request.bad = True
-                request.result = None
                 logger.warning(f'\"{request.query_text}\" not found or found with errors.')
                 logger.debug(e)
+                request.bad = True
+                request.result = None
+
             request.completed = True
             self.manager.append_completed_query_task(request)

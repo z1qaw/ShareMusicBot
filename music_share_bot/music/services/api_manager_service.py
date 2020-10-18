@@ -1,4 +1,5 @@
 import threading
+import time
 
 import requests
 import telebot
@@ -8,13 +9,28 @@ from ..api.apple_music.api import AppleMusicApi
 from .api_services.manager_data import ServiceDataRequestQuery
 from .api_services.spotify_service_thread import SpotifyServiceThread
 from .api_services.yandex_music_service_thread import YandexMusicServiceThread
-from .utils import duration_in_ms_to_str
+from .utils import duration_in_ms_to_str, apple_music_artist_name_filter, apple_music_track_name_filter
 
 logger = telebot.logger
 
 
 class ApiManagerService(threading.Thread):
     def __init__(self, music_share_bot):
+        """ Описание работы сервиса:
+                Инициализация:
+                    self.search_results_count - глубина поиска (первые n запросов)
+                    На каждый сервис API (Yandex, Spotify) создаётся n Python-потоков.
+                    
+                Фоновая работа:
+                    От Telegram-бота в метод put_task приходит inline-запрос, этот метод
+                    сначала отсылает запрос к API Apple Music на поиск, получает ответ.
+                    Если ответ пустой (ничего не найдено), то отправляет юзеру inline-ответ
+                    о том, что ничего не найдено, и завершает работу метода.
+                    Если ответ от Apple Music содержит результат, то метод put_task заносит в
+                    self.incompleted_main_results пакет с результатом от Apple Music и ID
+                    Telegram inline-запроса от юзера. Далее метод отправляет каждый результат в API-поток каждого сервиса
+                    """
+
         super().__init__()
         self.session = requests.session()
         self.music_share_bot = music_share_bot
@@ -47,14 +63,8 @@ class ApiManagerService(threading.Thread):
             limit=self.search_results_count
         )
 
-        self.incompleted_main_results.append(
-            {
-                'telebot_query_id': query.id,
-                'result': main_results
-            }
-        )
-
         if not main_results.top_results:
+            logger.info(f'No results for query {query.query}')
             telebot_query_result = [types.InlineQueryResultArticle(
                 id=1, title='Not found', description='Try to find something another',
                 input_message_content=types.InputTextMessageContent(
@@ -64,24 +74,35 @@ class ApiManagerService(threading.Thread):
             self.music_share_bot.bot.answer_inline_query(query.id, telebot_query_result)
             return
 
+        self.incompleted_main_results.append(
+            {
+                'telebot_query_id': query.id,
+                'result': main_results
+            }
+        )
+
         for service_name in self.api_workers:
             for worker in self.api_workers[service_name]:
                 result_num = self.api_workers[service_name].index(worker)
-                result = main_results.top_results[result_num]
+                result = None
+                try:
+                    result = main_results.top_results[result_num]
+                except IndexError:
+                    continue
                 apple_music_object_name = result.__class__.__name__
                 query_scheme = {
                     'Song': {
                         'search_query': '{} - {}'.format(
-                            result.artist_name,
-                            result.name
+                            apple_music_artist_name_filter(result.artist_name),
+                            apple_music_track_name_filter(result.name)
                         ) if apple_music_object_name == 'Song' else None,
                         'spotify_object_name': 'track',
                         'yandex_music_object_name': 'track'
                     },
                     'Album': {
                         'search_query': '{} - {}'.format(
-                            result.artist_name,
-                            result.name
+                            apple_music_artist_name_filter(result.artist_name),
+                            apple_music_track_name_filter(result.name)
                         ) if apple_music_object_name == 'Album' else None,
                         'spotify_object_name': 'album',
                         'yandex_music_object_name': 'album'
@@ -112,7 +133,10 @@ class ApiManagerService(threading.Thread):
             task for task in self.completed_api_requests
             if task.bot_inline_query_id == query_task.bot_inline_query_id
         ]
-        if len(found_requests) == self.search_results_count * len(self.api_workers):
+
+        this_task_main_result = [result for result in self.incompleted_main_results
+                                    if result['telebot_query_id'] == query_task.bot_inline_query_id][0]
+        if len(found_requests) == len(this_task_main_result['result'].top_results) * len(self.api_workers):
             found_main_query = [
                 main_query for main_query in self.incompleted_main_results
                 if main_query['telebot_query_id'] == query_task.bot_inline_query_id
@@ -170,7 +194,6 @@ class ApiManagerService(threading.Thread):
                 found_main_query['telebot_query_id'],
                 telebot_query_result
             )
-
 
     def run(self):
         pass

@@ -17,11 +17,12 @@ class MusicShareBotPolling(threading.Thread):
         self.polling_interval = polling_interval
         self.search_query_max_results = 6
         self.manager = ApiManagerService(self)
+        self.manager.start()
 
 
     def start_polling(self) -> None:
         @self.bot.inline_handler(func=lambda query: re.findall('^[\w\s]+$', query.query))
-        def handle_item_link_to_spotify_url_inline1(query):
+        def handle_item_link_to_spotify_url_inline(query):
             logger.info(f'Inline query {query.id} with hint {query.query}')
             self.manager.put_task(query)
 
@@ -31,7 +32,7 @@ class MusicShareBotPolling(threading.Thread):
             logger.debug(query)
 
         @self.bot.message_handler(commands=['start'])
-        def handle_message(message):
+        def handle_start_message(message):
             user_name = (' '.join(
                 message.from_user.first_name,
                 message.from_user.last_name
@@ -43,7 +44,7 @@ class MusicShareBotPolling(threading.Thread):
             )
 
         @self.bot.message_handler(commands=['help'])
-        def handle_message(message):
+        def handle_help_message(message):
             user_name = (' '.join(
                 message.from_user.first_name,
                 message.from_user.last_name

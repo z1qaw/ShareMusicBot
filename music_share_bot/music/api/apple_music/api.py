@@ -11,7 +11,7 @@ class AppleMusicApi:
         self.api_host = 'https://amp-api.music.apple.com'
         self.auth_key = 'Bearer eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNTk4NDE4MjQwLCJleHAiOjE2MTM5NzAyNDB9.FemTn31_pZp3RY88DLQWKtn13gyj3uNcqBYwUi7zbNPN8mKgexKu36sOoDI7F4dBqOSmKZaBeiafXINRgPPgSw'
 
-    def make_api_request(self, api_method_path, params):
+    def _make_api_request(self, api_method_path, params):
         api_method_url = self.api_host + api_method_path
         headers = {
             'authorization': self.auth_key
@@ -28,5 +28,5 @@ class AppleMusicApi:
             'limit': limit,
             'with': 'serverBubbles'
         }
-        api_response_data = self.make_api_request(api_method_path=api_method_path, params=params)
+        api_response_data = self._make_api_request(api_method_path=api_method_path, params=params)
         return search_query_answer_json_dict_to_class(api_response_data)
