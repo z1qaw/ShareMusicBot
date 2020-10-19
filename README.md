@@ -27,3 +27,5 @@ App must start correctly.
 
 - Search by services link
 - ChatBase integration
+- Convert links in group chats
+- Ad integration
