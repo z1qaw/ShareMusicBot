@@ -29,7 +29,7 @@ class ApiManagerService(threading.Thread):
                     Если ответ от Apple Music содержит результат, то метод put_task заносит в
                     self.incompleted_main_results пакет с результатом от Apple Music и ID
                     Telegram inline-запроса от юзера. Далее метод отправляет каждый результат в API-поток каждого сервиса
-                    """
+        """
 
         super().__init__()
         self.session = requests.session()
@@ -136,7 +136,9 @@ class ApiManagerService(threading.Thread):
 
         this_task_main_result = [result for result in self.incompleted_main_results
                                     if result['telebot_query_id'] == query_task.bot_inline_query_id][0]
-        if len(found_requests) == len(this_task_main_result['result'].top_results) * len(self.api_workers):
+        is_last_result = len(found_requests) == len(this_task_main_result['result'].top_results) * len(self.api_workers)
+
+        if is_last_result:
             found_main_query = [
                 main_query for main_query in self.incompleted_main_results
                 if main_query['telebot_query_id'] == query_task.bot_inline_query_id
@@ -195,5 +197,12 @@ class ApiManagerService(threading.Thread):
                 telebot_query_result
             )
 
+            self.incompleted_main_results.remove(found_main_query)
+            for completed_task in found_requests:
+                self.completed_api_requests.remove(completed_task)
+
     def run(self):
-        pass
+        while True:
+            time.sleep(0.5)
+            print('incompleted', [r['telebot_query_id'] for r in self.incompleted_main_results])
+            print('completed_api', [c.bot_inline_query_id for c in self.completed_api_requests])
