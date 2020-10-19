@@ -202,7 +202,4 @@ class ApiManagerService(threading.Thread):
                 self.completed_api_requests.remove(completed_task)
 
     def run(self):
-        while True:
-            time.sleep(0.5)
-            print('incompleted', [r['telebot_query_id'] for r in self.incompleted_main_results])
-            print('completed_api', [c.bot_inline_query_id for c in self.completed_api_requests])
+        pass
